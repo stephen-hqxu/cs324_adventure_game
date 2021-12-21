@@ -1,0 +1,33 @@
+body{
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+}
+
+#blocker{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0.0, 0.0, 0.0, 0.5);
+}
+
+#instruction{
+    width: 100%;
+    height: 100%;
+    line-height: 25px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    font-size: 18px;
+    font-family: "Chilanka";
+    color: beige;
+    cursor: pointer;
+}
+
+#gameTitle{
+    font-size: 40px;
+}

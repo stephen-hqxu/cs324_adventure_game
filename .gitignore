@@ -1,0 +1,5 @@
+#ignore vs core cache
+.vs/
+
+#ignore external libraries
+Library/
