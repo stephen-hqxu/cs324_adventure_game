@@ -20,7 +20,17 @@ $(document).ready(function(){
     //setup scene
     Scene = new THREE.Scene();
     Scene.background = new THREE.Color(0xFFFFFF);
-    Scene.fog = new THREE.Fog(0x000000, 1.0, 10.0);
+    Scene.fog = new THREE.Fog(0xDDDDDD, 1.0, 90.0);
+    //lighting
+    const indirect = new THREE.AmbientLight(0xFFFFFF, 0.4);
+    Scene.add(indirect);
+    const sun = new THREE.DirectionalLight(0xF5DFC1, 2.5);
+    sun.castShadow = true;
+    sun.shadow.camera.near = 1.0;
+    sun.shadow.camera.far = 1000.0;
+    sun.shadow.bias = 0.01;
+    sun.position.set(92.0, 15.0, -61.5);
+    Scene.add(sun);
     
     //setup game
     Game = new GameManager(Scene);
@@ -29,7 +39,7 @@ $(document).ready(function(){
     //register player controller
     $(Player.Controller).on("lock", function(){
         //start playing, hide the instruction screen
-        $("#blocker").css("display", "none");
+        $("#menu").css("display", "none");
         //reset frametime
         prevTime = performance.now();
 
@@ -40,7 +50,7 @@ $(document).ready(function(){
     });
     $(Player.Controller).on("unlock", function(){
         //stop playing, display instruction screen
-        $("#blocker").css("display", "block");
+        $("#menu").css("display", "flex");
 
         //disable control
         Player.Controller.enabled = false;
@@ -60,7 +70,7 @@ $(window).resize(function(){
 });
 
 //trigger game start
-$("#instruction").click(function(){
+$("#gameStart").click(function(){
     Game.CompPlayer.Controller.lock();
 });
 

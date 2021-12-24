@@ -2,13 +2,14 @@ import {
     PlaneBufferGeometry, 
     Mesh, 
     MeshPhongMaterial,
-    TextureLoader
+    TextureLoader,
+    RepeatWrapping,
+    LinearFilter,
+    LinearMipmapLinearFilter
 } from "../Library/three.module.js";
 import {
     Plane, 
-    Body, 
-    Material, 
-    ContactMaterial
+    Body
 } from "../Library/cannon-es.js";
 
 /**
@@ -16,33 +17,44 @@ import {
  */
 class Ground{
     //THREE geometry
-    GroundGeo = new PlaneBufferGeometry(50, 50, 5, 5);
+    GroundGeo = new PlaneBufferGeometry(200, 200, 5, 5);
     GroundRender;
     GroundMesh;
 
     //CANNON geometry
     GroundShape = new Plane();
-    GroundMat = new Material("physics");
-    GroundContactMat = new ContactMaterial(this.GroundMat, this.GroundMat, {
-        friction: 0.8, 
-        restitution: 0.3
-    });
-    GroundBody = new Body({
-        mass: 0,
-        material: this.GroundMat
-    });
+    GroundBody;
 
-    constructor(){
+    /**
+     * Create a new ground for the scene.
+     * @param {CANNON.Material} phy_mat The physics material for the ground.
+     */
+    constructor(phy_mat){
         //setup rendering material for the ground
         var groundTexture = new TextureLoader();
         groundTexture.setPath("./Resource/Grass004_1K-PNG/Grass004_1K_");
+        const load = (name) => {
+            const map = groundTexture.load(name);
+            //set map property
+            map.wrapS = RepeatWrapping;
+            map.wrapT = RepeatWrapping;
+            map.repeat.set(40.0, 40.0);
+            map.generateMipmaps = true;
+            map.minFilter = LinearMipmapLinearFilter;
+            map.magFilter = LinearFilter;
+            map.anisotropy = 16.0;
+
+            return map;
+        };
+
         this.GroundRender = new MeshPhongMaterial({
-            map: groundTexture.load("Color.png"),
-            aoMap: groundTexture.load("AmbientOcclusion.png"),
-            bumpMap: groundTexture.load("Displacement.png"),
-            normalMap: groundTexture.load("NormalGL.png"),
-            specularMap: groundTexture.load("Roughness.png")
+            map: load("Color.png"),
+            aoMap: load("AmbientOcclusion.png"),
+            bumpMap: load("Displacement.png"),
+            normalMap: load("NormalGL.png"),
+            specularMap: load("Roughness.png")
         });
+        this.GroundRender.shininess = 16.0;
         //rotate the ground so it is z-up
         this.GroundGeo.rotateX(-Math.PI / 2.0);
 
@@ -50,6 +62,10 @@ class Ground{
         this.GroundMesh.receiveShadow = true;
 
         //construct shape
+        this.GroundBody = new Body({
+            mass: 0.0,
+            material: phy_mat
+        });
         this.GroundBody.addShape(this.GroundShape);
         this.GroundBody.quaternion.setFromEuler(-Math.PI / 2.0, 0.0, 0.0);
     }
@@ -62,7 +78,6 @@ class Ground{
     addToWorld(scene, world){
         scene.add(this.GroundMesh);
 
-        world.addContactMaterial(this.GroundContactMat);
         world.addBody(this.GroundBody);
     }
 

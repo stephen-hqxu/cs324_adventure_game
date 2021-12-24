@@ -11,16 +11,14 @@ import {
 //Physics engine
 import {
     Sphere,
-    Body,
-    Material,
-    ContactMaterial
+    Body
 } from "../Library/cannon-es.js";
 
 /**
  * @brief Handles the main character controled by the player.
  */
 class Character{
-    ActiveCamera = new PerspectiveCamera(60.0, Character.currentAspect(), 1.0, 50.0);
+    ActiveCamera = new PerspectiveCamera(60.0, Character.currentAspect(), 0.1, 100.0);
     Controller;
 
     //the model of the character
@@ -31,24 +29,23 @@ class Character{
     CharMesh = new Mesh(this.CharGeo, this.CharRender);
 
     CharShape = new Sphere(1.3);
-    CharMat = new Material("physics");
-    CharContactMat = new ContactMaterial(this.CharMat, this.CharMat,{
-        friction: 0.25,
-        restitution: 0.0
-    });
-    CharBody = new Body({
-        mass: 0.5, 
-        material: this.CharMat
-    });
+    CharBody;
 
     /**
-     * @brief Initialise a new character
+     * @brief Initialise a new character.
+     * @param {CANNON.Material} phy_mat The physics material for the character.
      */
-    constructor(){
+    constructor(phy_mat){
         //setup character collision body
+        this.CharBody = new Body({
+            mass: 5.0,
+            material: phy_mat
+        });
         this.CharBody.addShape(this.CharShape);
-        this.CharBody.position.set(0.0, 5.0, 0.0);
+        this.CharBody.position.set(50.0, 2.5, -50.0);
         this.CharBody.linearDamping = 0.9;
+
+        this.CharMesh.castShadow = true;
 
         //setup controller
         this.Controller = new PointerLockControlsCannon(this.ActiveCamera, this.CharBody);
@@ -71,7 +68,6 @@ class Character{
     addToWorld(scene, world){
         scene.add(this.Controller.getObject());
 
-        world.addContactMaterial(this.CharContactMat);
         world.addBody(this.CharBody);
     }
 
