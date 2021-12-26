@@ -7,11 +7,13 @@ import {
     Body,
     ConvexPolyhedron,
     Box,
+    Sphere,
     Vec3
 } from "../Library/cannon-es.js";
 import {
     Quaternion,
     Vector3,
+    Vector2,
     DoubleSide
 } from "../Library/three.module.js";
 
@@ -20,6 +22,11 @@ import {
  */
 class House{
     Level = {};
+    //level target is a ghost object that does not collide but only triggers collision event when player reaches this area
+    LevelTarget = new Body({
+        mass: 0.0,
+        collisionResponse: false
+    });
 
     /**
      * @brief Create the master house map.
@@ -43,10 +50,6 @@ class House{
                 let HouseBody = new Body({
                     mass: 0.0,
                     material: phy_mat
-                });
-                let LevelBody = new Body({
-                    mass: 0.0,
-                    collisionResponse: false
                 });
                 house.traverse((object) => {
                     //handle different object types
@@ -120,6 +123,20 @@ class House{
                     }else if(object.isLight){
                         object.castShadow = true;
 
+                        const shadow = object.shadow;
+                        shadow.blurSamples = 8;
+                        shadow.radius = 8.0;
+                        shadow.mapSize = new Vector2(1024, 1024);
+
+                        //TODO: adjust shadow camera
+                        const camera = object.shadow.camera;
+                        camera.left = -100;
+                        camera.right = 100;
+                        camera.top = -100;
+                        camera.bottom = 100;
+                        camera.near = 1;
+                        camera.far = 200;
+
                     }else{
                         //handle some dummy objects
                         const objName = object.name;
@@ -131,14 +148,25 @@ class House{
                             object.getWorldPosition(levelWorld);
 
                             this.Level[objName] = levelWorld;
+
+                            if(objName.match("(End)$")){
+                                //this dummy object indicates the target of the level end
+                                const target = new Sphere(0.2);
+
+                                this.LevelTarget.addShape(target, levelWorld);
+                            }
                         }
                     }
                 });
 
                 //add house to the world
                 scene.add(house);
+
                 HouseBody.position.copy(house.position);
+                this.LevelTarget.position.copy(house.position);
+
                 world.addBody(HouseBody);
+                world.addBody(this.LevelTarget);
 
                 onFinish();
         });

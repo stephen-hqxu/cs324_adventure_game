@@ -9,11 +9,18 @@ canvas{
     outline: none;
 }
 
-#menu{
-    position: fixed;
-    left: 0;
-    top: 0;
-    
+#blocker{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0.0, 0.0, 0.0, 0.5);
+
+    color: beige;
+    text-align: center;
+    font-family: "Chilanka";
+}
+
+.overlay{
     width: 100%;
     height: 100%;
 
@@ -21,12 +28,6 @@ canvas{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    background-color: rgba(0.0, 0.0, 0.0, 0.5);
-
-    color: beige;
-    text-align: center;
-    font-family: "Chilanka";
 }
 
 .button{

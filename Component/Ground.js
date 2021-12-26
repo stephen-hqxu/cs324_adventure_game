@@ -5,7 +5,8 @@ import {
     TextureLoader,
     RepeatWrapping,
     LinearFilter,
-    LinearMipmapLinearFilter
+    LinearMipmapLinearFilter,
+    Vector3
 } from "../Library/three.module.js";
 import {
     Plane, 
@@ -57,6 +58,7 @@ class Ground{
         this.GroundRender.shininess = 16.0;
         //rotate the ground so it is z-up
         this.GroundGeo.rotateX(-Math.PI / 2.0);
+        this.GroundGeo.translate(100.0, 0.0, -100.0);
 
         this.GroundMesh = new Mesh(this.GroundGeo, this.GroundRender);
         this.GroundMesh.receiveShadow = true;

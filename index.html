@@ -9,22 +9,33 @@
     </head>
 
     <body>
-        <div id="menu">
-            <h1 style="font-size: 50px;">
-                Home Sweet Home
-            </h1>
+        <div id="blocker">
+            <div class="overlay" id="menu">
+                <h1 style="font-size: 50px;">
+                    Home Sweet Home
+                </h1>
+                <p id="levelLabel" style="font-size: 25px;">
+                    Loading...
+                </p>
+    
+                <p class="button" id="gameStart">
+                    Start
+                </p>
+                <p class="button">
+                    Control
+                </p>
+            </div>
+            <div class="overlay" id="advancement", style="display: none;">
+                <h1 style="font-size: 65px;">
+                    Congratulations
+                </h1>
 
-            <p class="button" id="gameStart">
-                Start
-            </p>
-            <p class="button">
-                Story
-            </p>
-            <p class="button">
-                Control
-            </p>
+                <p class="button" id="nextLevel">
+                    Next Level
+                </p>
+            </div>
         </div>
-
+        
         <canvas id="gl-canvas" width="1024" heigth="1024"></canvas>
         <script type="Module" charset="UTF-8" src="./Main.js"></script>
     </body>

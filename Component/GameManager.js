@@ -24,6 +24,9 @@ class GameManager{
     CompGround = new Ground(this.MatGround);
     CompHouse;
 
+    //game level stuff
+    currentLevel = 1;
+
     constructor(scene){
         //Tweak contact properties.
         //Contact stiffness - use to make softer/harder contacts
@@ -55,8 +58,18 @@ class GameManager{
         this.CompGround.addToWorld(scene, this.World);
         this.CompPlayer.addToWorld(scene, this.World);
         this.CompHouse = new House(this.MatObstacle, scene, this.World, () => {
-            //start the game from level 1
-            this.setLevelStart(1);
+            //register end of level event
+            $(this.CompHouse.LevelTarget).on("collide", (event) => {
+                //player passes the current level
+                $(this).trigger("pass", {
+                    levelPassed: this.currentLevel
+                });
+                //advance to the next level.
+                this.currentLevel++;
+            });
+
+            //start the game
+            this.setLevelStart();
         });
     }
 
@@ -73,11 +86,11 @@ class GameManager{
     }
 
     /**
-     * @brief Set the character location to the start of a level.
-     * @param {number} level A number denoting the corresponding level.
+     * @brief Set the character location to the start of the current level.
      */
-    setLevelStart(level){
-        this.CompPlayer.CharBody.position.copy(this.CompHouse.getLevelCoordinate(level)[0]);
+    setLevelStart(){
+        $("#levelLabel").text("- Level " + this.currentLevel + " -");
+        this.CompPlayer.CharBody.position.copy(this.CompHouse.getLevelCoordinate(this.currentLevel)[0]);
     }
 
 };

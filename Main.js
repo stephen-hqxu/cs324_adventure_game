@@ -15,7 +15,7 @@ $(document).ready(function(){
     Renderer = new THREE.WebGLRenderer({ canvas: $("#gl-canvas").get(0), antialias: true });
 
     Renderer.shadowMap.enabled = true;
-    Renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    Renderer.shadowMap.type = THREE.VSMShadowMap;
 
     //setup scene
     Scene = new THREE.Scene();
@@ -27,30 +27,35 @@ $(document).ready(function(){
     
     //setup game
     Game = new GameManager(Scene);
-    const Player = Game.CompPlayer;
 
     //register player controller
-    $(Player.Controller).on("lock", function(){
+    $(Game.CompPlayer.Controller).on("lock", function(){
         //start playing, hide the instruction screen
-        $("#menu").css("display", "none");
+        $("#blocker").css("display", "none");
         //reset frametime
         prevTime = performance.now();
 
         //enable control
-        Player.Controller.enabled = true;
+        this.enabled = true;
 
         draw();
     });
-    $(Player.Controller).on("unlock", function(){
+    $(Game.CompPlayer.Controller).on("unlock", function(){
         //stop playing, display instruction screen
-        $("#menu").css("display", "flex");
+        $("#blocker").css("display", "block");
 
         //disable control
-        Player.Controller.enabled = false;
+        this.enabled = false;
 
         cancelAnimationFrame(DrawHandle);
     });
-    //setup game map
+    //setup game levels
+    $(Game).on("pass", function(event, arg){
+        //display end game screen
+        $(this.CompPlayer.Controller).trigger("unlock");
+        $("#menu").css("display", "none");
+        $("#advancement").css("display", "flex");
+    });
 
     //force the canvas to have the same size as the window before starting
     $(window).trigger("resize");
@@ -65,6 +70,15 @@ $(window).resize(function(){
 //trigger game start
 $("#gameStart").click(function(){
     Game.CompPlayer.Controller.lock();
+});
+//trigger game level advancement
+$("#nextLevel").click(function(){
+    //teleport player to the next level
+    Game.setLevelStart();
+
+    $("#gameStart").trigger("click");
+    $("#advancement").css("display", "none");
+    $("#menu").css("display", "flex");
 });
 
 function draw(){
