@@ -11,22 +11,25 @@ import {
 } from "../Library/cannon-es.js";
 import {
     Quaternion,
-    Vector3
+    Vector3,
+    DoubleSide
 } from "../Library/three.module.js";
 
 /**
  * @brief House is the main map of this game.
  */
 class House{
+    Level = {};
 
     /**
      * @brief Create the master house map.
      * @param {CANNON.Material} phy_mat The material for the entire house.
      * @param {THREE.Scene} scene The rendering scene to be added.
      * @param {CANNON.World} world The physics world to be added.
+     * @param {any} onFinish A callback function to be called when the model loading is done.
      * 
      */
-    constructor(phy_mat, scene, world){
+    constructor(phy_mat, scene, world, onFinish){
         //load model as a group and store it.
         const houseLoader = new GLTFLoader();
         houseLoader.setPath("./Resource/")
@@ -41,11 +44,18 @@ class House{
                     mass: 0.0,
                     material: phy_mat
                 });
+                let LevelBody = new Body({
+                    mass: 0.0,
+                    collisionResponse: false
+                });
                 house.traverse((object) => {
+                    //handle different object types
                     if(object.isMesh){
                         //rendering configuration
                         object.castShadow = true;
                         object.receiveShadow = true;
+                        //no face culling for imported model
+                        object.material.side = DoubleSide;
 
                         //physics configuration
                         if(object.name === "Wall"){
@@ -106,6 +116,22 @@ class House{
                         // console.log(housePart);
                         // //add to compound
                         // HouseBody.addShape(housePart, object.position);
+
+                    }else if(object.isLight){
+                        object.castShadow = true;
+
+                    }else{
+                        //handle some dummy objects
+                        const objName = object.name;
+
+                        //game level marker
+                        if(objName.match("^(Level).[0-9]*(Start|End)")){
+                            //attempt to convert from model to world space for the current object.
+                            const levelWorld = new Vector3();
+                            object.getWorldPosition(levelWorld);
+
+                            this.Level[objName] = levelWorld;
+                        }
                     }
                 });
 
@@ -113,7 +139,27 @@ class House{
                 scene.add(house);
                 HouseBody.position.copy(house.position);
                 world.addBody(HouseBody);
+
+                onFinish();
         });
+    }
+    
+    /**
+     * @brief Get the start and end coordinate in world space of a level.
+     * @param {number} level The number representing the level. Must be greater than 1.
+     * @returns A pair of coordinates denoting starting and ending coordinate.
+     */
+    getLevelCoordinate(level){
+        const levelName = "Level" + String(level);
+        const levelStart = levelName + "Start", levelEnd = levelName + "End";
+
+        //check if the level is valid
+        if(levelStart in this.Level && levelEnd in this.Level){
+            return [this.Level[levelStart], this.Level[levelEnd]];
+        }
+        //invalid level
+        console.error("Level \'" + level + "\' is invalid");
+        
     }
     
 };

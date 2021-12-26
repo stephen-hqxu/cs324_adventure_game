@@ -44,17 +44,20 @@ class GameManager{
         //register material contact
         this.World.addContactMaterial(new CANNON.ContactMaterial(this.MatPlayer, this.MatGround, {
             friction: 1.2,
-            restitution: 0.15
+            restitution: 0.3
         }));
         this.World.addContactMaterial(new CANNON.ContactMaterial(this.MatPlayer, this.MatObstacle, {
-            friction: 0.4,
-            restitution: 0.05
+            friction: 0.5,
+            restitution: 0.5
         }));
 
         //initialise all game components
         this.CompGround.addToWorld(scene, this.World);
         this.CompPlayer.addToWorld(scene, this.World);
-        this.CompHouse = new House(this.MatObstacle, scene, this.World);
+        this.CompHouse = new House(this.MatObstacle, scene, this.World, () => {
+            //start the game from level 1
+            this.setLevelStart(1);
+        });
     }
 
     /**
@@ -67,6 +70,14 @@ class GameManager{
         }
         
         this.CompPlayer.update(delta);
+    }
+
+    /**
+     * @brief Set the character location to the start of a level.
+     * @param {number} level A number denoting the corresponding level.
+     */
+    setLevelStart(level){
+        this.CompPlayer.CharBody.position.copy(this.CompHouse.getLevelCoordinate(level)[0]);
     }
 
 };

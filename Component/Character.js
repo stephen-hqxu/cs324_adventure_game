@@ -22,13 +22,13 @@ class Character{
     Controller;
 
     //the model of the character
-    CharGeo = new SphereBufferGeometry(1.3, 5, 5);
+    CharGeo = new SphereBufferGeometry(0.1, 5, 5);
     CharRender = new MeshLambertMaterial({
         color: 0xeeeeee
     });
     CharMesh = new Mesh(this.CharGeo, this.CharRender);
 
-    CharShape = new Sphere(1.3);
+    CharShape = new Sphere(0.1);
     CharBody;
 
     /**
@@ -38,12 +38,11 @@ class Character{
     constructor(phy_mat){
         //setup character collision body
         this.CharBody = new Body({
-            mass: 5.0,
+            mass: 60.0,
             material: phy_mat
         });
         this.CharBody.addShape(this.CharShape);
-        this.CharBody.position.set(50.0, 2.5, -50.0);
-        this.CharBody.linearDamping = 0.9;
+        this.CharBody.linearDamping = 0.95;
 
         this.CharMesh.castShadow = true;
 
