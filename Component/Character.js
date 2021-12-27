@@ -2,12 +2,13 @@ import {
     PerspectiveCamera, 
     SphereBufferGeometry,
     MeshLambertMaterial,
-    Mesh
+    Mesh,
+    Vector3
 } from "../Library/three.module.js";
 //Controller
 import {
     PointerLockControlsCannon
-} from "../Library/Control/PointerLockControlsCannon.js";
+} from "../Control/PointerLockControlsCannon.js";
 //Physics engine
 import {
     Sphere,
@@ -19,10 +20,12 @@ import {
  */
 class Character{
     ActiveCamera = new PerspectiveCamera(60.0, Character.currentAspect(), 0.1, 100.0);
+    //indication of view type, 1 is first person and so on.
+    CameraView = 1;
     Controller;
 
     //the model of the character
-    CharGeo = new SphereBufferGeometry(0.1, 5, 5);
+    CharGeo = new SphereBufferGeometry(0.1, 32, 32);
     CharRender = new MeshLambertMaterial({
         color: 0xeeeeee
     });
@@ -65,7 +68,11 @@ class Character{
      * @param {CANNON.World} world The physics world to be added.
      */
     addToWorld(scene, world){
+        //add camera to the scene
         scene.add(this.Controller.getObject());
+        //add the character representation
+        scene.add(this.CharMesh);
+        this.CharMesh.castShadow = true;
 
         world.addBody(this.CharBody);
     }
@@ -85,6 +92,41 @@ class Character{
      */
     update(delta){
         this.Controller.update(delta);
+
+        //update character position
+        const worldPos = new Vector3();
+        this.Controller.getObject().getWorldPosition(worldPos);
+        this.CharMesh.position.copy(worldPos);
+    }
+
+    /**
+     * @brief Switch the camera view type between first person and second person.
+     */
+    switchView(){
+        //determine the view type to be switched to.
+        const view = (this.CameraView == 1) ? 2 : 1;
+
+        //get the camera view direction
+        const offset = new Vector3(0.0, 0.0, -1.0);
+        offset.applyQuaternion(this.ActiveCamera.quaternion);
+        const orbitRadius = 2.0;
+
+        switch(view){
+            case 2: 
+                //to switch from 1st to 2nd person, offset the camera in reverse to its view direction
+                //the camera will be orbiting around the character
+                offset.negate();
+            case 1:
+                //to switch from 2nd to 1st, just do it in reverse.
+                this.ActiveCamera.translateOnAxis(offset, orbitRadius);
+                break;
+            default:
+                console.error("Unsupported view type");
+                break;
+        }
+
+        //update the current type
+        this.CameraView = view;
     }
 
 };

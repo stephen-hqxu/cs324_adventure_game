@@ -67,6 +67,13 @@ $(window).resize(function(){
     Renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+//keyboard event
+$(window).keypress(function(event){
+    if(event.code == "KeyV"){
+        Game.CompPlayer.switchView();
+    }
+});
+
 //trigger game start
 $("#gameStart").click(function(){
     Game.CompPlayer.Controller.lock();
