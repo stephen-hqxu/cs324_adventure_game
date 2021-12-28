@@ -46,11 +46,14 @@ class Character{
         });
         this.CharBody.addShape(this.CharShape);
         this.CharBody.linearDamping = 0.95;
+        this.CharBody.angularDamping = 0.9;
 
         this.CharMesh.castShadow = true;
 
         //setup controller
-        this.Controller = new PointerLockControlsCannon(this.ActiveCamera, this.CharBody);
+        this.Controller = new PointerLockControlsCannon(this.ActiveCamera, this.CharBody, () => {
+            $(this).trigger("death");
+        });
 
     }
 

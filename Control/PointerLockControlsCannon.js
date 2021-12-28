@@ -6,7 +6,7 @@ import * as CANNON from '../Library/cannon-es.js'
  * @author schteppe / https://github.com/schteppe
  */
 class PointerLockControlsCannon extends THREE.EventDispatcher {
-  constructor(camera, cannonBody) {
+  constructor(camera, cannonBody, onDeath) {
     super()
 
     this.enabled = false
@@ -15,7 +15,7 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
     // var eyeYPos = 2 // eyes are 2 meters above the ground
     this.velocityFactor = 0.1
-    this.jumpVelocity = 5
+    this.jumpVelocity = 6
 
     this.pitchObject = new THREE.Object3D()
     this.pitchObject.add(camera)
@@ -32,6 +32,8 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     this.moveRight = false
 
     this.canJump = false
+
+    this.lastAltitude = this.getObject().position.y;
 
     const contactNormal = new CANNON.Vec3() // Normal in the contact, pointing *out* of whatever the player touched
     const upAxis = new CANNON.Vec3(0, 1, 0)
@@ -53,6 +55,17 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
         // Use a "good" threshold value between 0 and 1 here!
         this.canJump = true
       }
+
+      //calculate distance fallen
+      const currentAltitude = this.getObject().position.y;
+      const deltaAltitude = this.lastAltitude - currentAltitude;
+      if(deltaAltitude > 3.5){
+        //the object is falling from a large distance
+        //the number is the death treshold
+        onDeath();
+      }
+      //update altitude
+      this.lastAltitude = currentAltitude;
     })
 
     this.velocity = this.cannonBody.velocity
@@ -149,6 +162,7 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
       case 'Space':
         if (this.canJump) {
           this.velocity.y = this.jumpVelocity
+          this.lastAltitude = this.getObject().position.y;
         }
         this.canJump = false
         break

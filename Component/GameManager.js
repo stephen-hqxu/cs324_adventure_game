@@ -51,7 +51,7 @@ class GameManager{
         }));
         this.World.addContactMaterial(new CANNON.ContactMaterial(this.MatPlayer, this.MatObstacle, {
             friction: 0.5,
-            restitution: 0.5
+            restitution: 0.2
         }));
 
         //initialise all game components
@@ -59,11 +59,9 @@ class GameManager{
         this.CompPlayer.addToWorld(scene, this.World);
         this.CompHouse = new House(this.MatObstacle, scene, this.World, () => {
             //register end of level event
-            $(this.CompHouse.LevelTarget).on("collide", (event) => {
+            $(this.CompHouse.LevelTarget).on("collide", () => {
                 //player passes the current level
-                $(this).trigger("pass", {
-                    levelPassed: this.currentLevel
-                });
+                $(this).trigger("pass");
                 //advance to the next level.
                 this.currentLevel++;
             });

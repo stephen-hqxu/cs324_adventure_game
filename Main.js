@@ -3,6 +3,8 @@ import * as THREE from "./Library/three.module.js";
 
 //Master controller
 import {GameManager} from "./Component/GameManager.js";
+//Helper
+import {switchOverlay} from "./Utility/ChangeOverlay.js";
 
 let Renderer, Scene, DrawHandle;
 let Game;
@@ -50,11 +52,15 @@ $(document).ready(function(){
         cancelAnimationFrame(DrawHandle);
     });
     //setup game levels
-    $(Game).on("pass", function(event, arg){
+    $(Game).on("pass", function(){
         //display end game screen
+        switchOverlay("menu", "advancement");
         $(this.CompPlayer.Controller).trigger("unlock");
-        $("#menu").css("display", "none");
-        $("#advancement").css("display", "flex");
+    });
+    $(Game.CompPlayer).on("death", function(){
+        //handle game over
+        switchOverlay("menu", "death");
+        $(this.Controller).trigger("unlock");
     });
 
     //force the canvas to have the same size as the window before starting
@@ -84,8 +90,14 @@ $("#nextLevel").click(function(){
     Game.setLevelStart();
 
     $("#gameStart").trigger("click");
-    $("#advancement").css("display", "none");
-    $("#menu").css("display", "flex");
+    switchOverlay("advancement", "menu");
+});
+//trigger game restart from the current level
+$("#gameRestart").click(function(){
+    Game.setLevelStart();
+
+    $("#gameStart").trigger("click");
+    switchOverlay("death", "menu");
 });
 
 function draw(){
