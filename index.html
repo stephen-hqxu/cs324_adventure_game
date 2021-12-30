@@ -21,7 +21,7 @@
                 <p class="button" id="gameStart">
                     Start
                 </p>
-                <p class="button">
+                <p class="button" id="gameControl">
                     Control
                 </p>
             </div>
@@ -34,13 +34,34 @@
                     Next Level
                 </p>
             </div>
+            <div class="overlay" id="finish" style="display: none;">
+                <h1>
+                    Game Passed
+                </h1>
+
+                <h2>
+                    You have passed all levels
+                </h2>
+            </div>
             <div class="overlay" id="death" style="display: none;">
                 <h1>
-                    Game over
+                    Game Over
                 </h1>
 
                 <p class="button" id="gameRestart">
                     Try Again
+                </p>
+            </div>
+            <div class="overlay" id="help" style="display: none;">
+                <h1>
+                    Control
+                </h1>
+
+                <p>Move: WSAD</p>
+                <p>Jump: Space</p>
+                <p>Switch View: V</p>
+                <p class="button" id="backToMenu">
+                    Back
                 </p>
             </div>
         </div>

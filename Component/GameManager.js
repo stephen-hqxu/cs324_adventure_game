@@ -26,6 +26,7 @@ class GameManager{
 
     //game level stuff
     currentLevel = 1;
+    totalLevel = 2;
 
     constructor(scene){
         //Tweak contact properties.
@@ -60,10 +61,15 @@ class GameManager{
         this.CompHouse = new House(this.MatObstacle, scene, this.World, () => {
             //register end of level event
             $(this.CompHouse.LevelTarget).on("collide", () => {
-                //player passes the current level
-                $(this).trigger("pass");
-                //advance to the next level.
-                this.currentLevel++;
+                if(this.currentLevel < this.totalLevel){
+                    //player passes the current level
+                    $(this).trigger("pass");
+                    //advance to the next level.
+                    this.currentLevel++;
+                }else{
+                    //all levels have been finished
+                    $(this).trigger("finish");
+                }
             });
 
             //start the game

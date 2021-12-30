@@ -1,0 +1,7 @@
+# ignore latex cache output
+*.aux
+*.log
+*.synctex.gz
+
+# document output
+*.pdf

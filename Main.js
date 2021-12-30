@@ -57,6 +57,11 @@ $(document).ready(function(){
         switchOverlay("menu", "advancement");
         $(this.CompPlayer.Controller).trigger("unlock");
     });
+    $(Game).on("finish", function(){
+        //all game levels are passed
+        switchOverlay("menu", "finish");
+        $(this.CompPlayer.Controller).trigger("unlock");
+    });
     $(Game.CompPlayer).on("death", function(){
         //handle game over
         switchOverlay("menu", "death");
@@ -98,6 +103,13 @@ $("#gameRestart").click(function(){
 
     $("#gameStart").trigger("click");
     switchOverlay("death", "menu");
+});
+//view the help page
+$("#gameControl").click(function(){
+    switchOverlay("menu", "help");
+});
+$("#backToMenu").click(function(){
+    switchOverlay("help", "menu");
 });
 
 function draw(){
