@@ -1,0 +1,2 @@
+# ignore model because it is too large for the repo
+*.glb
