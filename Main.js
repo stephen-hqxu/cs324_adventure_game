@@ -22,7 +22,7 @@ $(document).ready(function(){
     //setup scene
     Scene = new THREE.Scene();
     Scene.background = new THREE.Color(0xFFFFFF);
-    Scene.fog = new THREE.Fog(0xDDDDDD, 1.0, 90.0);
+    Scene.fog = new THREE.Fog(0xDDDDDD, 1.0, 110.0);
     //lighting
     const indirect = new THREE.AmbientLight(0xFFFFFF, 0.4);
     Scene.add(indirect);

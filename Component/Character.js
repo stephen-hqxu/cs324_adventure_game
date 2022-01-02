@@ -19,7 +19,7 @@ import {
  * @brief Handles the main character controled by the player.
  */
 class Character{
-    ActiveCamera = new PerspectiveCamera(60.0, Character.currentAspect(), 0.1, 100.0);
+    ActiveCamera = new PerspectiveCamera(60.0, Character.currentAspect(), 0.1, 120.0);
     //indication of view type, 1 is first person and so on.
     CameraView = 1;
     Controller;
@@ -73,6 +73,7 @@ class Character{
     addToWorld(scene, world){
         //add camera to the scene
         scene.add(this.Controller.getObject());
+        this.Controller.registerWorld(world);
         //add the character representation
         scene.add(this.CharMesh);
         this.CharMesh.castShadow = true;

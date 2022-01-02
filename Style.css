@@ -9,6 +9,10 @@ canvas{
     outline: none;
 }
 
+p{
+    font-size: 18px;
+}
+
 #blocker{
     position: absolute;
     width: 100%;

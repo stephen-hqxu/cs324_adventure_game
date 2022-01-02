@@ -5,7 +5,7 @@ import {
 
 import {
     Body,
-    ConvexPolyhedron,
+    Trimesh,
     Box,
     Sphere,
     Vec3
@@ -62,8 +62,10 @@ class House{
 
                         //physics configuration
                         if(object.name === "Wall"){
-                            //TODO: ignore wall for now because it is a concave shape
-                            console.warn("Wall geometry is ignored for collision detection.");
+                            //wall is very special, it's non-convex
+                            //there are ways to setup collision detection for this shape, for example by constructing a triangular mesh (like a torus).
+                            //however with such a large number of vertex it degrades the performance significantly.
+                            console.warn("Wall collision is not enabled.");
                             return;
                         }
                         
@@ -97,29 +99,6 @@ class House{
                         //compound this shape
                         HouseBody.addShape(partShape, offset, orientation);
 
-                        // const attr = object.geometry.attributes;
-                        // const rawVertex = attr.position.array;
-                        // const rawIndex = object.geometry.index.array;
-                        // const rawSize = attr.position.itemSize;
-                        
-                        // //convert every mesh into a convex hull bounding box
-                        // const vertex = [], index = [];
-                        // for(var i = 0; i < rawVertex.length; i += rawSize){
-                        //     vertex.push(new Vec3(rawVertex[i], rawVertex[i + 1], rawVertex[i + 2]));
-                        // }
-                        // for(var i = 0; i < rawIndex.length; i += rawSize){
-                        //     index.push([rawIndex[i], rawIndex[i + 1], rawIndex[i + 2]]);
-                        // }
-
-                        // //construct polyhedron
-                        // const housePart = new ConvexPolyhedron({
-                        //     vertices: vertex,
-                        //     faces: index
-                        // });
-                        // console.log(housePart);
-                        // //add to compound
-                        // HouseBody.addShape(housePart, object.position);
-
                     }else if(object.isLight){
                         object.castShadow = true;
 
@@ -128,13 +107,12 @@ class House{
                         shadow.radius = 8.0;
                         shadow.mapSize = new Vector2(1024, 1024);
 
-                        //TODO: adjust shadow camera
                         const camera = object.shadow.camera;
                         camera.left = -100;
                         camera.right = 100;
                         camera.top = -100;
                         camera.bottom = 100;
-                        camera.near = 1;
+                        camera.near = 10;
                         camera.far = 200;
 
                     }else{

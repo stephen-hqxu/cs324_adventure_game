@@ -34,6 +34,7 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     this.canJump = false
 
     this.lastAltitude = this.getObject().position.y;
+    this.lastContact = null;
 
     const contactNormal = new CANNON.Vec3() // Normal in the contact, pointing *out* of whatever the player touched
     const upAxis = new CANNON.Vec3(0, 1, 0)
@@ -66,6 +67,9 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
       }
       //update altitude
       this.lastAltitude = currentAltitude;
+
+      //record the body being collided
+      this.lastContact = contact.bj.id;
     })
 
     this.velocity = this.cannonBody.velocity
@@ -162,7 +166,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
       case 'Space':
         if (this.canJump) {
           this.velocity.y = this.jumpVelocity
-          this.lastAltitude = this.getObject().position.y;
         }
         this.canJump = false
         break
@@ -238,6 +241,23 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     this.velocity.z += this.inputVelocity.z
 
     this.yawObject.position.copy(this.cannonBody.position)
+  }
+
+  /**
+   * @brief Register a world listener that checks if the body is still in contact with the target.
+   * @param {CANNON.World} world The world with the body added.
+   */
+  registerWorld(world){
+    //when the body is no longer in contact with the target, i.e., in the air
+    world.addEventListener("endContact", (event) => {
+      //make sure we are checking the controlling body
+      if((event.bodyA === this.cannonBody && event.bodyB.id === this.lastContact) || 
+        (event.bodyA.id === this.lastContact && event.bodyB === this.cannonBody)){
+          //update altitude
+          //this is to make sure when the character is moving downhill the altitude is correct when it leaves the ground
+          this.lastAltitude = this.getObject().position.y;
+      }
+    });
   }
 }
 
