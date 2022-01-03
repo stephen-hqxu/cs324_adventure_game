@@ -27,8 +27,12 @@
         \textbf{CS324 Coursework Supporting Document}
     \end{center}
 
-    \normalsize
     \flushleft
+    \small
+
+    \textit{Word Count: 999}
+
+    \normalsize
 
     \section{Overview}
 
@@ -39,9 +43,13 @@
         \caption{A showcase of an in-game screenshot.}
     \end{figure}
 
+    \subsection{Getting Started}
+
+    Due to cross-origin protection on web browser such that local resource like texture and models are not allowed to be accessed directly, and the game can only be executed on a HTTP web server. To run the game, locate to the root directory where \textit{index.html} is located.
+
     \section{The Game}
 
-    In the game, the player will be controlling a sphere as the main character, navigating around a house with nearly 1:1 scale of a real-life bedroom \footnote{In fact, it is my bedroom.}. The main game map, the bedroom, is modelled using \textit{Blender} and exported as \textit{glb} format; texture used in the map is gathered online \cite{texture_res} with permission to use for individual project.
+    In the game, the player will be controlling a sphere as the main character, navigating around a house. The main game map, the bedroom, is modelled using \textit{Blender} and exported as \textit{glb} format; texture used in the map is gathered online \cite{texture_res} with permission to use for individual project.
 
     \subsection{Features}
 
@@ -49,7 +57,7 @@
     
     House model and various game objects are imported using \textit{GLTFLoader} provided by \textit{THREE.js}. To construct correct axis-aligned bounding box for collision detection, each individual shape in the model such as furnitures around the house and obstacles, needs to have its bounding box computed and transform the the coordinate system from model to world space.
 
-    The character controller is modified from a demo program shown in \textit{CANNON-es} \cite{cannon_controller}. In particular, the character controller has support to momentum, which allows the character to move by a short distance when it is stopping. Certain obstacles are relatively farther away such that player should maintain an initial velocity to increase the jumping distance to land on the target. Additionally, the camera allows cycling view between first-person and second-person \footnote{It (as well as top-down view) may also be referred as third-person.}. The second-person view is achieved by displacing the camera along its negated view direction by a certain distance.
+    The character controller is modified from \textit{CANNON-es} \cite{cannon_controller} demo program. In particular, the controller has support to momentum, which allows the character to move by a short distance when it is stopping. Certain obstacles are relatively farther away such that player should maintain an initial velocity to increase the jumping distance to land on the target. Additionally, the camera allows cycling view between first-person and second-person \footnote{It (as well as top-down view) may also be referred as third-person.}. The second-person view is achieved by displacing the camera along its negated view direction by a certain distance.
 
     The game also features death system to avoid cheating or allow player to restart. When the character collides with any surface, the game reads the altitude of the surface the character was previouly stayed on, and calculate the delta altitude. If the character has fallen by greater than a limit, a death screen will be displayed and allows the player to restart the level.
 
@@ -77,17 +85,43 @@
 
     \subsubsection{Map}
 
-    The bedroom is modelled using \textit{Blender}.
+    The bedroom is modelled using \textit{Blender}. The bedroom layout and furniture models are taken from real-life \footnote{Actually, it is my bedroom.}. The house is first created using line segments and subdivide each segment to allow adding details to the wall in the future, then solidify lines to create a connected 2D face, then extrude the face into a 3D wall model. Windows are created by bridging faces on inner and outer wall.
+
+    \begin{figure}[H]
+        \begin{tabular}{cc}
+            \includegraphics[width=0.45\textwidth]{house_model1.png} & \includegraphics[width=0.45\textwidth]{house_model2.png} \\
+            (a) The 2D layout of the house & (b) Extrude layout into a 3D wall, \\
+            {} & bridge faces to make window \\
+            \includegraphics[width=0.45\textwidth]{house_model3.png} & \includegraphics[width=0.45\textwidth]{house_model4.png} \\
+            (c) Add furniture to the house & (d) Texture mapping and lighting
+        \end{tabular}
+        \caption{A simple illustration of the creation of game map.}
+    \end{figure}
+
+    Each furniture is modelled from primitive shapes with certain amount of detail added.
+
+    \begin{figure}[H]
+        \begin{tabular}{cc}
+            \includegraphics[width=0.45\textwidth]{house_detail1.png} & \includegraphics[width=0.45\textwidth]{house_detail2.png} \\
+            (a) Part of the bed model & (b) The wardrobe \\
+            \multicolumn{2}{c}{\includegraphics[width=0.5\textwidth]{house_detail3.png}} \\
+            \multicolumn{2}{c}{(c) The table and shelves with obstacles on top}
+        \end{tabular}
+        \caption{Shows the creation of each furniture with illustration of details.}
+    \end{figure}
 
     \subsubsection{Levels}
 
-    The game contains 2 independent levels.
+    The game contains 2 independent levels. The first level takes place on the top of the shelves and table and it is mainly a jumping puzzle; the player starts at the top shelf and needs to progress downward to the table. The second level starts at the top of the wardrobe and requires player to move on narrow planes, and progress downward to the bed, and is finally concluded by a set of fluctuated jumping puzzles. Player is required to finish the current level in order to progress to the next, and it is not yet allowed to go back to the previous level or skip a level.
+
+    All levels are tested to be feasible and they are reasonably difficult, player is expected to pass all levels in 5 to 10 minutes of effort depending on skills.
     
     \section{Limitations and Future Works}
 
     \begin{itemize}[label=\(\diamond\)]
         \item Collision detection for the house wall is disabled as significant amount of the time is needed to construct a collision mesh for a non-convex shape in real-time. Improvement can be made in the future such as reducing the complexity of the wall model by eliminating unnecessary vertices.
         \item Game can be exploited such that some obstacles can be bypassed.
+        \item Due to the limitation of the physics engine, if the character jumps right below an obstacle it will no longer be able to jump until it leaves the currently contacted surface.
     \end{itemize}
 
     \bibliographystyle{unsrt}

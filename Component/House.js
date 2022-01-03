@@ -14,7 +14,8 @@ import {
     Quaternion,
     Vector3,
     Vector2,
-    DoubleSide
+    DoubleSide,
+    PointLight
 } from "../Library/three.module.js";
 
 /**
@@ -133,6 +134,20 @@ class House{
 
                                 this.LevelTarget.addShape(target, levelWorld);
                             }
+                        }
+
+                        //room light
+                        //we need to add room light manually because THREE does not support Blender plane light.
+                        if(objName === "MainRoomLight"){
+                            //get the world position
+                            const roomLightWorld = new Vector3();
+                            object.getWorldPosition(roomLightWorld);
+
+                            const roomLight = new PointLight(0xFFFFF0, 0.9, 30.0);
+                            roomLight.position.copy(roomLightWorld);
+
+                            //manually add the light to the scene
+                            scene.add(roomLight);
                         }
                     }
                 });
